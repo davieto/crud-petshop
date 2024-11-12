@@ -67,18 +67,24 @@ Pet* criarPet() {
     return novoPet;
 }
 
-//Inserindo no inicio
+//Inserindo no final
 void inserirPet(Pets* pets) {
     printf("\tCadastrando novo Pet: \n");
     Pet* novoPet = criarPet();
-    novoPet->prox = *pets;
-    *pets = novoPet;
+    if(*pets == NULL) {
+        *pets = novoPet;
+    }else {
+        Pet* tmp = *pets;
+        while (tmp->prox != NULL){
+            tmp = tmp->prox;
+        }
+        tmp->prox = novoPet;
+    }
     printf("Pet criado com sucesso!\n");
-    esperarEnter();
 }
 
 void imprimiPet(Pet* pet) {
-    printf("\nPet #%d:\n", pet->id);
+    printf("\nPet: \n[ID#%d]\n", pet->id);
     printf("Nome: %s", pet->nome);
     printf("Raca: %s", pet->raca);
     printf("Idade: %d\n", pet->idade);
@@ -95,7 +101,6 @@ void listarPets(Pets* pets) {
             pet = pet->prox;
         }
     }
-    esperarEnter();
 }
 
 void limparPets(Pets* pets) {
@@ -111,6 +116,111 @@ void limparPets(Pets* pets) {
     }
 }
 
+Pet* buscarPetPorID(Pets* pets, int id) {
+    Pet* pet = NULL;
+    Pet* tmp = *pets;
+    while(tmp != NULL) {
+        if(tmp->id == id) {
+            pet = tmp;
+            break;
+        }
+        tmp = tmp->prox;
+    }
+    return pet;
+}
+
+void editarPet(Pet* pet) {
+    int option;
+    for(;;) {
+        system("cls");
+        imprimiPet(pet);
+        printf("\n[1] - Nome\n");
+        printf("[2] - Raca\n");
+        printf("[3] - Idade\n");
+        printf("[4] - Observacao\n");
+        printf("[0] - Voltar\n");
+        printf("Deseja alterar que campo: ");
+        scanf("%d", &option);
+        if(option == 1) {
+            printf("Informe o novo nome: ");
+            fflush(stdin);
+            fgets(pet->nome, TAMANHO_NOME_PET, stdin);
+            fflush(stdin);
+        }else if(option == 2) {
+            printf("Informe a nova raca: ");
+            fflush(stdin);
+            fgets(pet->raca, TAMANHO_RACA_PET, stdin);
+            fflush(stdin);
+        }else if(option == 3) {
+            printf("Informe a nova idade: ");
+            scanf("%d", &pet->idade);
+        }else if(option == 4) {
+            printf("Informe a nova observacao: ");
+            fflush(stdin);
+            fgets(pet->observacao, TAMANHO_OBS_PET, stdin);
+            fflush(stdin);
+        }else if(option == 0) {
+            break;
+        }else {
+            printf("Opcao invalida!\n");
+            esperarEnter();
+        }
+    }
+    return;
+}
+
+void editarPets(Pets* pets) {
+    int idBuscar;
+    listarPets(pets);
+    printf("Informe o ID do Pet que deseja alterar: ");
+    scanf("%d", &idBuscar);
+    Pet* pet = buscarPetPorID(pets, idBuscar);
+    if(pet != NULL) {
+        editarPet(pet);
+    }else {
+        printf("Pet nao encontrado!\n");
+    }
+}
+
+void removerPetPorID(Pets* pets, int id) {
+    Pet* remover = NULL;
+
+    if((*pets)->id == id) {
+        remover = *pets;
+        *pets = remover->prox;
+        free(remover);
+        printf("Removido com sucesso!\n");
+        esperarEnter();
+    }else {
+        Pet* ant = *pets;
+        while(ant->prox != NULL) {
+            if(ant->prox->id == id) {
+                remover = ant->prox;
+                break;
+            } 
+            ant = ant->prox;
+        }
+        if(remover == NULL) {
+            printf("Pet nao encontrado!\n");
+            esperarEnter();
+        }else {
+            ant->prox = remover->prox;
+            free(remover);
+            printf("Removido com sucesso!\n");
+            esperarEnter();
+        }
+    }
+    return;
+}
+
+void removerPets(Pets* pets) {
+    int idBuscar;
+    listarPets(pets);
+    printf("Informe o ID do Pet que deseja alterar: ");
+    scanf("%d", &idBuscar);
+    removerPetPorID(pets, idBuscar);
+}
+
 void menuPet(Pets* pets) {
     int option;
     for(;;) {
@@ -118,19 +228,27 @@ void menuPet(Pets* pets) {
         printf("\tPETS\n");
         printf("[1] - Inserir Pet\n");
         printf("[2] - Listar Pets\n");
+        printf("[3] - Editar Pet\n");
+        printf("[4] - Remover Pet\n");
         printf("[0] - Voltar\n");
         printf("Informe a opcao que deseja: ");
         scanf("%d", &option);
         if (option == 1) {
             inserirPet(pets);
+            esperarEnter();
         }else if(option == 2) {
             listarPets(pets);
+            esperarEnter();
+        }else if(option == 3) {
+            editarPets(pets);
+        }else if(option == 4) {
+            removerPets(pets);
         }else if(option == 0) {
             return;
         }else {
             printf("Opcao invalida!");
+            esperarEnter();
         }
-        
     }
 }
 
