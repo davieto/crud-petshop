@@ -223,14 +223,33 @@ void editarPets(Pets* pets) {
     return;
 }
 
+int confirmarRemocao() {
+    int option;
+    for(;;) {
+        system("cls");
+        printf("Tem certeza que deseja apagar o registro?\n");
+        printf("[1] - Sim\n");
+        printf("[0] - Nao\n");
+        printf("Informe a opcao que deseja: ");
+        scanf("%d", &option);
+        if(option == 1 || option == 0) {
+            return option;
+        }else {
+            printf("Opcao invalida!\n");
+        }
+    }
+}
+
 void removerPetPorID(Pets* pets, int id) {
     Pet* remover = NULL;
     if((*pets)->id == id) {
-        remover = *pets;
-        *pets = remover->prox;
-        free(remover);
-        printf("Removido com sucesso!\n");
-        esperarEnter();
+        if(confirmarRemocao()) {
+            remover = *pets;
+            *pets = remover->prox;
+            free(remover);
+            printf("Removido com sucesso!\n");
+            esperarEnter();
+        }
     }else {
         Pet* ant = *pets;
         while(ant->prox != NULL) {
@@ -244,21 +263,48 @@ void removerPetPorID(Pets* pets, int id) {
             printf("Pet nao encontrado!\n");
             esperarEnter();
         }else {
-            ant->prox = remover->prox;
-            free(remover);
-            printf("Removido com sucesso!\n");
-            esperarEnter();
+            if(confirmarRemocao()) {
+                ant->prox = remover->prox;
+                free(remover);
+                printf("Removido com sucesso!\n");
+                esperarEnter();
+            }
         }
     }
     return;
 }
 
 void removerPets(Pets* pets) {
-    int idBuscar;
-    listarPets(pets);
-    printf("Informe o ID do Pet que deseja alterar: ");
-    scanf("%d", &idBuscar);
-    removerPetPorID(pets, idBuscar);
+    int idBuscar, option = 2;
+    char filtro[50];
+    for(;;) {
+        if(option == 1) {
+            printf("Informe o ID do Pet que deseja alterar: ");
+            scanf("%d", &idBuscar);
+            removerPetPorID(pets, idBuscar);
+        }else if(option == 2) {
+            system("cls");
+            listarPets(pets);
+        }else if(option == 3) {
+            system("cls");
+            printf("Informe o filtro do nome que deseja: ");
+            scanf("%s", filtro);
+            listarPetsFiltradosPorNome(pets, filtro);
+        }else if(option == 0) {
+            return;
+        }else {
+            printf("Opcao invalida!\n");
+            esperarEnter();
+            system("cls");
+        }
+        printf("[1] - Informar ID para Remocao de Pet\n");
+        printf("[2] - Listar Todos os Pets\n");
+        printf("[3] - Filtrar Pet por nome\n");
+        printf("[0] - Voltar\n");
+        printf("Informe a opcao que deseja: ");
+        scanf("%d", &option);
+    }
+    return;
 }
 
 void menuPet(Pets* pets) {
