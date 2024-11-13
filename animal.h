@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
+#include <string.h>
 
 #define TAMANHO_NOME_PET 50
 #define TAMANHO_RACA_PET 50
@@ -93,11 +94,26 @@ void imprimiPet(Pet* pet) {
 
 void listarPets(Pets* pets) {
     if(*pets == NULL) {
-        printf("Não existe pets");
+        printf("Nqo existe pets\n");
     }else {
         Pet* pet = *pets;
         while (pet != NULL){
             imprimiPet(pet);
+            pet = pet->prox;
+        }
+    }
+}
+
+
+void listarPetsFiltradosPorNome(Pets* pets, char filtro[50]) {
+    if(*pets == NULL) {
+        printf("Nao existe pets\n");
+    }else {
+        Pet* pet = *pets;
+        while (pet != NULL){
+            if(strstr(pet->nome, filtro) != NULL) {
+                imprimiPet(pet);
+            }
             pet = pet->prox;
         }
     }
@@ -170,21 +186,45 @@ void editarPet(Pet* pet) {
 }
 
 void editarPets(Pets* pets) {
-    int idBuscar;
-    listarPets(pets);
-    printf("Informe o ID do Pet que deseja alterar: ");
-    scanf("%d", &idBuscar);
-    Pet* pet = buscarPetPorID(pets, idBuscar);
-    if(pet != NULL) {
-        editarPet(pet);
-    }else {
-        printf("Pet nao encontrado!\n");
+    int idBuscar, option = 2;
+    char filtro[50];
+    for(;;) {
+        if(option == 1) {
+            printf("Informe o ID do Pet que deseja alterar: ");
+            scanf("%d", &idBuscar);
+            Pet* pet = buscarPetPorID(pets, idBuscar);
+            if(pet != NULL) {
+                editarPet(pet);
+            }else {
+                printf("Pet nao encontrado!\n");
+            }
+        }else if(option == 2) {
+            system("cls");
+            listarPets(pets);
+        }else if(option == 3) {
+            system("cls");
+            printf("Informe o filtro do nome que deseja: ");
+            scanf("%s", filtro);
+            listarPetsFiltradosPorNome(pets, filtro);
+        }else if(option == 0) {
+            return;
+        }else {
+            printf("Opcao invalida!\n");
+            esperarEnter();
+            system("cls");
+        }
+        printf("[1] - Informar ID para Edicao de Pet\n");
+        printf("[2] - Listar Todos os Pets\n");
+        printf("[3] - Filtrar Pet por nome\n");
+        printf("[0] - Voltar\n");
+        printf("Informe a opcao que deseja: ");
+        scanf("%d", &option);
     }
+    return;
 }
 
 void removerPetPorID(Pets* pets, int id) {
     Pet* remover = NULL;
-
     if((*pets)->id == id) {
         remover = *pets;
         *pets = remover->prox;
