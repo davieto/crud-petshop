@@ -281,7 +281,7 @@ void menuFunc(Funcionarios *funcionarios)
             deletarFuncionario(funcionarios);
             break;
         default:
-            printf("Opçao invalida!\n");
+            printf("Opcao invalida!\n");
             printf("Pressione enter para continuar...\n");
             getchar();
             break;
