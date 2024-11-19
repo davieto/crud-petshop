@@ -1,8 +1,10 @@
 #include "animal.h"
+#include "cliente.h"
 
 int main(void){
     int option;
     Pets* pets = criarListaPets();
+    Clientes* clientes = criarListaClientes();
     for(;;) {
         system("cls");
         printf("\t---PET SHOP---\n");
@@ -22,7 +24,7 @@ int main(void){
         }else if(option == 3) {
             printf("Em producao...\n");
         }else if(option == 4) {
-            printf("Em producao...\n");
+            menuClientes(clientes);
         }else if(option == 5) {
             printf("Em producao...\n");
         }else if(option == 6) {
@@ -35,5 +37,6 @@ int main(void){
         esperarEnter();
     }
     limparPets(pets);
+    limparClientes(clientes);
     return 0;
 }
