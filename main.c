@@ -1,5 +1,6 @@
 #include "animal.h"
 #include "funcionario.h"
+#include "cliente.h"
 
 int main(void)
 {
@@ -56,5 +57,6 @@ int main(void)
     }
     limparPets(pets);
     deletarListaFunc(funcionarios);
+    limparClientes(clientes);
     return 0;
 }
