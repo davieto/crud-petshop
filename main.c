@@ -1,9 +1,13 @@
 #include "animal.h"
+#include "funcionario.h"
 
-int main(void){
+int main(void)
+{
     int option;
-    Pets* pets = criarListaPets();
-    for(;;) {
+    Pets *pets = criarListaPets();
+    Funcionarios *funcionarios = criarListaFunc();
+    for (;;)
+    {
         system("cls");
         printf("\t---PET SHOP---\n");
         printf("[1] - Gerenciamento Pets\n");
@@ -15,25 +19,42 @@ int main(void){
         printf("[0] - Encerrar Programa\n\n");
         printf("Informe oque deseja: ");
         scanf("%d", &option);
-        if(option == 1) {
+        fflush(stdin);
+        if (option == 1)
+        {
             menuPet(pets);
-        }else if(option == 2) {
+        }
+        else if (option == 2)
+        {
             printf("Em producao...\n");
-        }else if(option == 3) {
+        }
+        else if (option == 3)
+        {
             printf("Em producao...\n");
-        }else if(option == 4) {
+        }
+        else if (option == 4)
+        {
             printf("Em producao...\n");
-        }else if(option == 5) {
+        }
+        else if (option == 5)
+        {
+            menuFunc(funcionarios);
+        }
+        else if (option == 6)
+        {
             printf("Em producao...\n");
-        }else if(option == 6) {
-            printf("Em producao...\n");
-        }else if(option == 0) {
+        }
+        else if (option == 0)
+        {
             break;
-        }else{
+        }
+        else
+        {
             printf("Opcao invalida!\n");
         }
         esperarEnter();
     }
     limparPets(pets);
+    deletarListaFunc(funcionarios);
     return 0;
 }
