@@ -7,6 +7,7 @@ int main(void)
     int option;
     Pets *pets = criarListaPets();
     Funcionarios *funcionarios = criarListaFunc();
+    Clientes* clientes = criarListaClientes();
     for (;;)
     {
         system("cls");
@@ -35,7 +36,7 @@ int main(void)
         }
         else if (option == 4)
         {
-            printf("Em producao...\n");
+            menuClientes(clientes);
         }
         else if (option == 5)
         {
