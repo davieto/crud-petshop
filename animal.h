@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 #include <string.h>
+#include "cliente.h"
 
 #define TAMANHO_NOME_PET 50
 #define TAMANHO_RACA_PET 50
@@ -12,11 +13,11 @@
 
 struct pet {
     int id;
-    int idCliente;
     char nome[TAMANHO_NOME_PET];
     char raca[TAMANHO_RACA_PET];
     int idade;
     char observacao[TAMANHO_OBS_PET];
+    int idCliente;
     struct pet* prox;
 };
 
@@ -42,7 +43,48 @@ Pets* criarListaPets() {
     }
 }
 
-Pet* criarPet() {
+int selecionarClienteParaPet(Clientes *clientes) {
+    int idBuscar, option = 2;
+    char filtro[TAMANHO_NOME_CLIENTE];
+    if(*clientes != NULL) {
+        for(;;) {
+            if (option == 1) {
+                printf("Informe o ID do Cliente que deseja alterar: ");
+                scanf("%d", &idBuscar);
+                Cliente* cliente = buscarClientePorID(clientes, idBuscar);
+                if (cliente != NULL) {
+                    return cliente->id;
+                } else {
+                    printf("Cliente não encontrado!\n");
+                }
+            } else if (option == 2) {
+                system("cls");
+                listarClientes(clientes);
+            } else if (option == 3) {
+                system("cls");
+                printf("Informe o filtro do nome que deseja: ");
+                scanf("%s", filtro);
+                listarClientesFiltradosPorNome(clientes, filtro);
+            } else if (option == 0) {
+                return -1;
+            } else {
+                printf("Opcao invalida!\n");
+                esperarEnterCliente();
+                system("cls");
+            }
+            printf("[1] - Informar ID para selecao de cliente para o Pet\n");
+            printf("[2] - Listar todos os clientes\n");
+            printf("[3] - Filtrar cliente por nome\n");
+            printf("[0] - Pet nao ha cliente\n");
+            printf("Informe a opcao que deseja: ");
+            scanf("%d", &option);
+        }
+    }else {
+        return -1;
+    }
+}
+
+Pet* criarPet(Clientes* clientes) {
     Pet* novoPet = (Pet*) malloc(sizeof(Pet));
     if(novoPet == NULL) {
         printf("Erro alocacao novo Pet...\n");
@@ -50,7 +92,6 @@ Pet* criarPet() {
     }
     novoPet->id = idPets;
     idPets++;
-    novoPet->idCliente = -1;
     novoPet->prox = NULL;
     fflush(stdin);
     printf("Informe o nome do pet: ");
@@ -65,13 +106,14 @@ Pet* criarPet() {
     printf("Informe observacoes do pet(Opcional): ");
     fgets(novoPet->observacao, TAMANHO_OBS_PET, stdin);
     fflush(stdin);
+    novoPet->idCliente = selecionarClienteParaPet(clientes);
     return novoPet;
 }
 
 //Inserindo no final
-void inserirPet(Pets* pets) {
+void inserirPet(Pets* pets, Clientes* clientes) {
     printf("\tCadastrando novo Pet: \n");
-    Pet* novoPet = criarPet();
+    Pet* novoPet = criarPet(clientes);
     if(*pets == NULL) {
         *pets = novoPet;
     }else {
@@ -84,35 +126,44 @@ void inserirPet(Pets* pets) {
     printf("Pet criado com sucesso!\n");
 }
 
-void imprimiPet(Pet* pet) {
+void imprimiPet(Pet* pet, Clientes* clientes) {
     printf("\nPet: \n[ID#%d]\n", pet->id);
     printf("Nome: %s", pet->nome);
     printf("Raca: %s", pet->raca);
     printf("Idade: %d\n", pet->idade);
     printf("Observacoes: %s", pet->observacao);
+    if(pet->idCliente != -1) {
+        Cliente* cliente = buscarClientePorID(clientes, pet->idCliente);
+        if(cliente != NULL) {
+            printf("Nome do Cliente: %s", cliente->nome);
+        }else {
+            printf("Nome do Cliente: *CLIENTE REMOVIDO*\n");
+        }
+    }else {
+        printf("Nome do Cliente: *CLIENTE NAO SELECIONADO*\n");
+    }
 }
 
-void listarPets(Pets* pets) {
+void listarPets(Pets* pets, Clientes* clientes) {
     if(*pets == NULL) {
         printf("Nqo existe pets\n");
     }else {
         Pet* pet = *pets;
         while (pet != NULL){
-            imprimiPet(pet);
+            imprimiPet(pet, clientes);
             pet = pet->prox;
         }
     }
 }
 
-
-void listarPetsFiltradosPorNome(Pets* pets, char filtro[50]) {
+void listarPetsFiltradosPorNome(Pets* pets, Clientes* clientes, char filtro[TAMANHO_NOME_PET]) {
     if(*pets == NULL) {
         printf("Nao existe pets\n");
     }else {
         Pet* pet = *pets;
         while (pet != NULL){
             if(strstr(pet->nome, filtro) != NULL) {
-                imprimiPet(pet);
+                imprimiPet(pet, clientes);
             }
             pet = pet->prox;
         }
@@ -145,15 +196,16 @@ Pet* buscarPetPorID(Pets* pets, int id) {
     return pet;
 }
 
-void editarPet(Pet* pet) {
+void editarPet(Pet* pet, Clientes* clientes) {
     int option;
     for(;;) {
         system("cls");
-        imprimiPet(pet);
+        imprimiPet(pet, clientes);
         printf("\n[1] - Nome\n");
         printf("[2] - Raca\n");
         printf("[3] - Idade\n");
         printf("[4] - Observacao\n");
+        printf("[5] - Cliente\n");
         printf("[0] - Voltar\n");
         printf("Deseja alterar que campo: ");
         scanf("%d", &option);
@@ -175,6 +227,8 @@ void editarPet(Pet* pet) {
             fflush(stdin);
             fgets(pet->observacao, TAMANHO_OBS_PET, stdin);
             fflush(stdin);
+        }else if(option == 5) {
+            pet->idCliente = selecionarClienteParaPet(clientes);
         }else if(option == 0) {
             break;
         }else {
@@ -185,7 +239,7 @@ void editarPet(Pet* pet) {
     return;
 }
 
-void editarPets(Pets* pets) {
+void editarPets(Pets* pets, Clientes* clientes) {
     int idBuscar, option = 2;
     char filtro[50];
     for(;;) {
@@ -194,18 +248,18 @@ void editarPets(Pets* pets) {
             scanf("%d", &idBuscar);
             Pet* pet = buscarPetPorID(pets, idBuscar);
             if(pet != NULL) {
-                editarPet(pet);
+                editarPet(pet, clientes);
             }else {
                 printf("Pet nao encontrado!\n");
             }
         }else if(option == 2) {
             system("cls");
-            listarPets(pets);
+            listarPets(pets, clientes);
         }else if(option == 3) {
             system("cls");
             printf("Informe o filtro do nome que deseja: ");
             scanf("%s", filtro);
-            listarPetsFiltradosPorNome(pets, filtro);
+            listarPetsFiltradosPorNome(pets, clientes, filtro);
         }else if(option == 0) {
             return;
         }else {
@@ -274,9 +328,9 @@ void removerPetPorID(Pets* pets, int id) {
     return;
 }
 
-void removerPets(Pets* pets) {
+void removerPets(Pets* pets, Clientes* clientes) {
     int idBuscar, option = 2;
-    char filtro[50];
+    char filtro[TAMANHO_NOME_PET];
     for(;;) {
         if(option == 1) {
             printf("Informe o ID do Pet que deseja alterar: ");
@@ -284,12 +338,12 @@ void removerPets(Pets* pets) {
             removerPetPorID(pets, idBuscar);
         }else if(option == 2) {
             system("cls");
-            listarPets(pets);
+            listarPets(pets, clientes);
         }else if(option == 3) {
             system("cls");
             printf("Informe o filtro do nome que deseja: ");
             scanf("%s", filtro);
-            listarPetsFiltradosPorNome(pets, filtro);
+            listarPetsFiltradosPorNome(pets, clientes, filtro);
         }else if(option == 0) {
             return;
         }else {
@@ -307,7 +361,7 @@ void removerPets(Pets* pets) {
     return;
 }
 
-void menuPet(Pets* pets) {
+void menuPet(Pets* pets, Clientes* clientes) {
     int option;
     for(;;) {
         system("cls");
@@ -320,15 +374,15 @@ void menuPet(Pets* pets) {
         printf("Informe a opcao que deseja: ");
         scanf("%d", &option);
         if (option == 1) {
-            inserirPet(pets);
+            inserirPet(pets, clientes);
             esperarEnter();
         }else if(option == 2) {
-            listarPets(pets);
+            listarPets(pets, clientes);
             esperarEnter();
         }else if(option == 3) {
-            editarPets(pets);
+            editarPets(pets, clientes);
         }else if(option == 4) {
-            removerPets(pets);
+            removerPets(pets, clientes);
         }else if(option == 0) {
             return;
         }else {

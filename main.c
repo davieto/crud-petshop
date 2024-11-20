@@ -24,7 +24,7 @@ int main(void)
         fflush(stdin);
         if (option == 1)
         {
-            menuPet(pets);
+            menuPet(pets, clientes);
         }
         else if (option == 2)
         {
