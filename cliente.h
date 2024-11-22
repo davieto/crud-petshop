@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TAMANHO_NOME_CLIENTE 50
+#define TAMANHO_NOME_CLIENTE 51
 #define TAMANHO_ENDERECO_CLIENTE 100
 #define TAMANHO_TELEFONE_CLIENTE 20
 
